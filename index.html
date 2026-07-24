@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>隱私權政策 — 自由 YT 總結器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #0f0f0f; color: #e8e8e8;
+      line-height: 1.8; max-width: 720px; margin: 0 auto; padding: 40px 24px;
+    }
+    h1 { font-size: 24px; color: #ff4e4e; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 40px; }
+    h2 { font-size: 16px; color: #ffd54f; margin: 32px 0 10px;
+         padding-bottom: 6px; border-bottom: 1px solid #333; }
+    p  { font-size: 14px; color: #ccc; margin-bottom: 12px; }
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { font-size: 14px; color: #ccc; margin-bottom: 6px; }
+    strong { color: #fff; }
+    a  { color: #3ea6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .highlight {
+      background: #1a1a2e; border: 1px solid #333; border-radius: 8px;
+      padding: 14px 18px; margin: 16px 0; font-size: 13px; color: #aaa;
+    }
+    .tag {
+      display: inline-block; background: #1e3a5f; color: #3ea6ff;
+      font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-right: 4px;
+    }
+    footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #333;
+             font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 隱私權政策</h1>
+  <p class="subtitle">自由 YT 總結器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-07-24</p>
+
+  <div class="highlight">
+    <strong>一句話摘要：</strong>本擴充功能將 YouTube 影片內容（URL、字幕、音訊）、Podcast 音檔、或你選取的文字，傳送至 Google Gemini API 進行 AI 分析，分析結果與設定資料儲存在你的裝置本機。我們沒有自己的後端伺服器，不收集任何資料。
+  </div>
+
+  <h2>1. 傳送至 Gemini API 的資料</h2>
+  <p>當你點擊「分析」時，本擴充功能會依下列分析模式擇一將資料傳送至 <strong>Google Gemini API</strong>（由你提供的 API 金鑰驗證）：</p>
+  <ul>
+    <li>
+      <strong>🔓 yt-dlp 字幕橋接</strong>（每次分析都會嘗試，需電腦上先跑過一次 <code>setup_caption_bridge_helper.py</code> 設定精靈才會真正生效）<br>
+      擴充功能會跟 YouTube 官方字幕擷取「平行賽跑」，同時透過 Chrome Native Messaging（<code>nativeMessaging</code> 權限，安裝擴充功能時即授權，不需另外操作）呼叫本機安裝的 yt-dlp 抓取字幕，兩邊誰先成功就用誰，藉此繞過 YouTube 官方字幕 API 偶發的反爬蟲封鎖。<strong>此流程僅在你自己的電腦本機執行，只有影片 ID 會傳給本機的 yt-dlp 程式，不涉及任何第三方伺服器或資料上傳</strong>；抓到的字幕文字接著才會依下方一般流程傳送至 Gemini API 分析。未跑過設定精靈的使用者，這個步驟會自動快速失敗、無痛退回原本的字幕擷取方式，不影響其他任何功能。
+    </li>
+    <li>
+      <strong>⚡ URL 直傳模式</strong>（預設，適用已建索引的 YouTube 影片）<br>
+      影片的 YouTube URL 會直接傳送給 Gemini，由 Google 自行讀取影片內容。
+      <em>你的裝置不下載影片；傳送的僅為 URL 字串。</em>
+    </li>
+    <li>
+      <strong>💬 字幕模式</strong>（URL 直傳失敗時備援）<br>
+      字幕文字（從 YouTube 伺服器下載）會傳送至 Gemini API。
+    </li>
+    <li>
+      <strong>🎬 視覺分析模式</strong>（無字幕備援，需登入）<br>
+      與 URL 直傳模式相同，僅傳送 YouTube URL 字串，由 Gemini 自行讀取影片畫面內容，用於字幕/URL直傳皆失敗時的備援分析。
+    </li>
+    <li>
+      <strong>💬 留言模式</strong>（長影片 / 無字幕最終備援）<br>
+      影片的熱門留言文字（透過 YouTube InnerTube API 取得）傳送至 Gemini API。
+    </li>
+    <li>
+      <strong>💬 留言解讀</strong>（選用，需登入，2026-07-20新增）<br>
+      不論影片有無字幕都可手動觸發：分析熱門留言的觀眾反應與熱議話題，作為內容摘要之外的額外分析。資料來源與傳送方式同上方「留言模式」。
+    </li>
+    <li>
+      <strong>⛏️ 淘金模式</strong>（需登入，僅支援有字幕的影片）<br>
+      使用與「字幕模式」相同的字幕文字，額外分三次呼叫 Gemini API 做結構化萃取與驗證篩選，不傳送任何新增的個人資料。
+    </li>
+    <li>
+      <strong>🔍 選字問AI</strong>（需登入）<br>
+      你在摘要/淘金結果中選取的文字（僅限選取範圍內的文字本身，不含上下文）會傳送至 Gemini API，並啟用 Google Search grounding（Google即時搜尋）以提供最新解釋。
+    </li>
+    <li>
+      <strong>🎙️ Podcast 訂閱摘要</strong>（需登入 + 你額外授權的網域存取權限）<br>
+      訂閱的 Podcast 節目新集數音檔會從其託管網域（例如 SoundOn、Firstory 等，因各節目託管平台不同，需要 <code>optional_host_permissions</code> 動態授權）下載，並透過 Google Gemini <strong>Files API</strong> 上傳音檔本身進行摘要，摘要完成後由 Google 端刪除暫存音檔（依 Gemini Files API 規則，上傳檔案預設 48 小時後自動刪除）。
+    </li>
+    <li>
+      <strong>🌙 今日回顧</strong>（手動觸發，免費方案每月3次，Pro無限次；Pro可額外設定每日自動於指定時間產生並跳出系統通知，需累積當日3支以上分析紀錄才會觸發，內容不足時不會發送）<br>
+      將你當天已產生的摘要文字（非原始逐字稿，是已經AI處理過的摘要內容，最多1500字/篇）彙整後傳送至 Gemini API，整合成單一回顧報告。回顧結果會與其他分析紀錄一併儲存在本機。
+    </li>
+  </ul>
+  <p>以上所有資料僅用於產生摘要，遵循 <a href="https://ai.google.dev/terms" target="_blank">Google AI 使用條款</a> 與 <a href="https://policies.google.com/privacy" target="_blank">Google 隱私權政策</a>。</p>
+
+  <h2>2. 頻道 / Podcast 訂閱自動摘要（背景處理）</h2>
+  <p>訂閱 YouTube 頻道或 Podcast 節目後，本擴充功能會用 Chrome <code>alarms</code> API 定期（背景）檢查是否有新影片/新集數，偵測到新內容時<strong>自動</strong>（不需要你手動點擊）依上方「傳送至 Gemini API 的資料」相同的資料流程產生摘要卡片，並透過 <code>notifications</code> API 顯示系統通知。</p>
+  <ul>
+    <li>此背景流程只在你主動訂閱的頻道/節目上執行，不會掃描或存取你未訂閱的內容</li>
+    <li>產生的摘要卡片儲存在本機（<code>chrome.storage.local</code>），可在 popup 內查看或移除</li>
+    <li>訂閱 Podcast 節目時，因各節目音檔託管網域不同，會請求 <code>optional_host_permissions</code>（動態網域存取權限）——這個授權彈窗只在你輸入 Podcast 連結時才會出現，YouTube 頻道訂閱不需要此授權</li>
+  </ul>
+
+  <h2>3. Pro 授權驗證（Gumroad）</h2>
+  <p>升級 Pro 後，你輸入的授權碼會傳送至 <strong>Gumroad</strong>（第三方數位商品金流平台）的授權驗證 API，確認購買是否有效。</p>
+  <ul>
+    <li>傳送的資料僅為授權碼本身，不含你的個人資料</li>
+    <li>驗證成功後，授權狀態（是否為Pro）與授權碼會儲存在你的裝置本機，用於後續每 7 天自動背景重新驗證一次（確認訂閱仍然有效、未退款/未取消）</li>
+    <li>金流本身（信用卡資訊等）由 Gumroad 直接處理，我方完全不經手、不儲存任何金流資料</li>
+  </ul>
+  <p>此流程遵循 <a href="https://gumroad.com/privacy" target="_blank">Gumroad 隱私權政策</a>。</p>
+
+  <h2>4. 儲存於你裝置本機的資料</h2>
+  <p>以下資料透過 <strong>chrome.storage.local</strong> 儲存在你的電腦上，<strong>不會傳送至任何第三方（除 Gemini API 分析本身外）</strong>：</p>
+  <ul>
+    <li><strong>Gemini API 金鑰</strong> — 你自行輸入並儲存，僅用於呼叫 Gemini API</li>
+    <li><strong>分析歷史紀錄</strong> — 最近 5 筆摘要（每筆最多 1,500 字），含影片標題與影片 ID</li>
+    <li><strong>每日使用次數</strong> — 免費方案的每日次數計數</li>
+    <li><strong>登入資料</strong>（選用，Google 帳號登入後）— 電子郵件、顯示名稱、大頭貼網址、帳號識別碼（sub）</li>
+    <li><strong>訂閱清單與摘要卡片</strong>（選用，訂閱頻道/Podcast後）— 訂閱的頻道ID/Podcast RSS網址、標題、縮圖網址，以及自動產生的摘要卡片內容</li>
+    <li><strong>Pro授權碼與授權狀態</strong>（選用，升級Pro後）— 見上方「Pro授權驗證」章節</li>
+    <li><strong>收藏庫</strong>（選用，你主動點擊收藏後）— 最多200筆，獨立於50筆上限的分析歷史紀錄之外儲存，不會被自動清除</li>
+  </ul>
+  <p><strong>OAuth 存取 Token</strong> 僅存於記憶體（不寫入磁碟），瀏覽器關閉後即消失。</p>
+
+  <h2>5. Google 帳號登入（選用）</h2>
+  <p>你可選擇以 Google 帳號登入以解鎖進階功能。登入流程透過 Google OAuth 2.0 進行。我們會取得以下資料：</p>
+  <ul>
+    <li><strong>電子郵件地址</strong>（email）— 識別帳號</li>
+    <li><strong>顯示名稱</strong>（name）— 顯示於面板</li>
+    <li><strong>大頭貼網址</strong>（picture）— 顯示用途</li>
+    <li><strong>Google 帳號識別碼</strong>（sub）— 識別唯一用戶</li>
+  </ul>
+  <p>以上資料<strong>僅儲存在你的裝置本機</strong>，不上傳至任何伺服器。</p>
+  <p>登出時，本擴充功能會撤銷 Google 端的存取授權，並清除所有本機登入資料。</p>
+
+  <h2>6. 我們沒有後端伺服器</h2>
+  <p>本擴充功能<strong>不設有任何自建後端伺服器</strong>。所有 API 呼叫皆由你的瀏覽器直接發出至第三方服務本身（Gemini API 使用你自己的金鑰；Gumroad 僅在升級Pro時發出授權驗證請求），資料不經過我方任何中間服務。</p>
+
+  <h2>7. 權限說明</h2>
+  <ul>
+    <li><strong>activeTab / scripting</strong> — 在 YouTube 頁面注入面板 UI</li>
+    <li><strong>storage / unlimitedStorage</strong> — 儲存 API 金鑰、設定、摘要歷史、訂閱清單至本機（訂閱功能累積的摘要卡片可能超過預設 5MB 限制，故需要 unlimitedStorage）</li>
+    <li><strong>identity</strong> — Google OAuth 登入流程</li>
+    <li><strong>alarms</strong> — 頻道/Podcast訂閱的定期背景檢查排程、Pro授權每7天自動重新驗證排程</li>
+    <li><strong>notifications</strong> — 訂閱的頻道/節目有新內容摘要完成時顯示系統通知</li>
+    <li><strong>host_permissions（api.gumroad.com）</strong> — Pro授權碼驗證專用，僅在你輸入授權碼時才會發出請求</li>
+    <li><strong>nativeMessaging</strong> — 呼叫本機 yt-dlp 字幕橋接程式專用（見上方「yt-dlp 字幕橋接」說明），安裝擴充功能時即一併授權；此權限本身不會讓擴充功能存取任意本機程式，只能連線到你透過 <code>setup_caption_bridge_helper.py</code> 明確註冊過的單一橋接程式，沒跑過設定精靈就不會有任何本機程式被實際呼叫</li>
+    <li><strong>optional_host_permissions（https://*/*，動態請求）</strong> — <strong>僅在你訂閱 Podcast 節目時才會跳出授權請求</strong>。因 Podcast 音檔可能託管在任意網域（SoundOn、Firstory、Anchor 等平台各不相同），無法預先列舉所有可能網域，故採用動態授權；YouTube 頻道訂閱與其他所有功能都不需要此權限</li>
+  </ul>
+
+  <h2>8. 資料分享</h2>
+  <p>我們<strong>不會</strong>將你的個人資料出售、出租或分享給任何第三方，除非：</p>
+  <ul>
+    <li>法律要求（例如法院命令）</li>
+    <li>你明確同意</li>
+  </ul>
+
+  <h2>9. 資料刪除</h2>
+  <p>
+    若要完全清除所有本機資料，請在 Chrome 擴充功能管理頁面移除本擴充功能。
+    登出可清除登入相關資料，但不影響 API 金鑰與摘要歷史。取消訂閱頻道/Podcast會移除對應的訂閱清單與摘要卡片。
+  </p>
+
+  <h2>10. 兒童隱私</h2>
+  <p>本服務不針對 13 歲以下兒童。若發現意外收集了兒童資料，請聯絡我們。</p>
+
+  <h2>11. 聯絡我們</h2>
+  <p>
+    如有隱私相關問題，請聯絡：<br>
+    <a href="mailto:alex1491tw@gmail.com">alex1491tw@gmail.com</a>
+  </p>
+
+  <h2>12. 政策更新</h2>
+  <p>
+    如本政策有重大變更，我們會在擴充功能更新說明中告知。
+    繼續使用本擴充功能即代表你接受最新版本的隱私權政策。
+  </p>
+
+  <footer>
+    © 2026 自由 YT 總結器 &nbsp;·&nbsp;
+    <a href="mailto:alex1491tw@gmail.com">alex1491tw@gmail.com</a>
+  </footer>
+
+</body>
+</html>
