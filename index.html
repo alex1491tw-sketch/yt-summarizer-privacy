@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>隱私權政策 — 自由 YT 總結器</title>
+  <title>隱私權政策 — YT萃取器</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,7 +36,7 @@
 <body>
 
   <h1>🔐 隱私權政策</h1>
-  <p class="subtitle">自由 YT 總結器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-07-24</p>
+  <p class="subtitle">YT萃取器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-11-06</p>
 
   <div class="highlight">
     <strong>一句話摘要：</strong>本擴充功能將 YouTube 影片內容（URL、字幕、音訊）、Podcast 音檔、或你選取的文字，傳送至 Google Gemini API 進行 AI 分析，分析結果與設定資料儲存在你的裝置本機。我們沒有自己的後端伺服器，不收集任何資料。
@@ -86,6 +86,10 @@
       <strong>🌙 今日回顧</strong>（手動觸發，免費方案每月3次，Pro無限次；Pro可額外設定每日自動於指定時間產生並跳出系統通知，需累積當日3支以上分析紀錄才會觸發，內容不足時不會發送）<br>
       將你當天已產生的摘要文字（非原始逐字稿，是已經AI處理過的摘要內容，最多1500字/篇）彙整後傳送至 Gemini API，整合成單一回顧報告。回顧結果會與其他分析紀錄一併儲存在本機。
     </li>
+    <li>
+      <strong>📍 地點抽取</strong>（主摘要完成後自動執行）<br>
+      產生主摘要後，本擴充功能會把同一份已取得的影片文字（字幕或留言，不含任何新增個人資料）額外傳送至 Gemini API 一次，抽取影片中明確提及的真實地點（城市、景點、店家等），在面板顯示成可點擊的地點列表。點擊地點會在新分頁開啟 Google 地圖搜尋，該地點名稱會成為 Google 地圖網址的一部分（等同你自己在 Google 地圖輸入該地名搜尋）。僅在影片有原始文字（字幕/留言模式）時執行，URL 直傳與視覺分析模式不會觸發。
+    </li>
   </ul>
   <p>以上所有資料僅用於產生摘要，遵循 <a href="https://ai.google.dev/terms" target="_blank">Google AI 使用條款</a> 與 <a href="https://policies.google.com/privacy" target="_blank">Google 隱私權政策</a>。</p>
 
@@ -97,7 +101,17 @@
     <li>訂閱 Podcast 節目時，因各節目音檔託管網域不同，會請求 <code>optional_host_permissions</code>（動態網域存取權限）——這個授權彈窗只在你輸入 Podcast 連結時才會出現，YouTube 頻道訂閱不需要此授權</li>
   </ul>
 
-  <h2>3. Pro 授權驗證（Gumroad）</h2>
+  <h2>3. 知識庫（File Search，選用功能）</h2>
+  <p>啟用知識庫功能後，你的分析摘要卡片（影片/節目標題＋AI 產生的摘要內容，<strong>非原始影片或逐字稿</strong>）會透過 Google Gemini <strong>File Search API</strong> 上傳至以你自己的 API 金鑰建立的知識庫儲存區，用於之後的跨影片問答檢索。</p>
+  <ul>
+    <li>與其他分析功能的關鍵差異：<strong>這是持久化儲存</strong>——上傳的文件會一直保存在 Google 伺服器上（隸屬你自己的 Google AI 帳號），不會像 Podcast 音檔那樣 48 小時後自動刪除</li>
+    <li>上傳範圍僅限摘要卡片文字，不含你的登入資料、API 金鑰或瀏覽紀錄</li>
+    <li>在知識庫頁面點「重建」會先刪除舊文件再重新上傳；刪除卡片時會一併刪除對應的雲端文件</li>
+    <li><strong>解除安裝本擴充功能不會自動刪除已上傳的雲端文件</strong>——移除前請先在知識庫頁面清空，或之後以同一把 API 金鑰透過 Google AI 介面自行刪除</li>
+    <li>此儲存區綁定你自己的 API 金鑰與 Google 帳號，我方無法存取其內容</li>
+  </ul>
+
+  <h2>4. Pro 授權驗證（Gumroad）</h2>
   <p>升級 Pro 後，你輸入的授權碼會傳送至 <strong>Gumroad</strong>（第三方數位商品金流平台）的授權驗證 API，確認購買是否有效。</p>
   <ul>
     <li>傳送的資料僅為授權碼本身，不含你的個人資料</li>
@@ -106,20 +120,21 @@
   </ul>
   <p>此流程遵循 <a href="https://gumroad.com/privacy" target="_blank">Gumroad 隱私權政策</a>。</p>
 
-  <h2>4. 儲存於你裝置本機的資料</h2>
+  <h2>5. 儲存於你裝置本機的資料</h2>
   <p>以下資料透過 <strong>chrome.storage.local</strong> 儲存在你的電腦上，<strong>不會傳送至任何第三方（除 Gemini API 分析本身外）</strong>：</p>
   <ul>
     <li><strong>Gemini API 金鑰</strong> — 你自行輸入並儲存，僅用於呼叫 Gemini API</li>
-    <li><strong>分析歷史紀錄</strong> — 最近 5 筆摘要（每筆最多 1,500 字），含影片標題與影片 ID</li>
+    <li><strong>分析歷史紀錄</strong> — 最近 50 筆摘要（每筆最多 1,500 字），含影片標題與影片 ID</li>
     <li><strong>每日使用次數</strong> — 免費方案的每日次數計數</li>
     <li><strong>登入資料</strong>（選用，Google 帳號登入後）— 電子郵件、顯示名稱、大頭貼網址、帳號識別碼（sub）</li>
     <li><strong>訂閱清單與摘要卡片</strong>（選用，訂閱頻道/Podcast後）— 訂閱的頻道ID/Podcast RSS網址、標題、縮圖網址，以及自動產生的摘要卡片內容</li>
     <li><strong>Pro授權碼與授權狀態</strong>（選用，升級Pro後）— 見上方「Pro授權驗證」章節</li>
     <li><strong>收藏庫</strong>（選用，你主動點擊收藏後）— 最多200筆，獨立於50筆上限的分析歷史紀錄之外儲存，不會被自動清除</li>
+    <li><strong>功能使用次數</strong> — 「分流」「Anki 匯出」「來源包匯出」「我做了／還沒」這幾個功能各被點了幾次，以及第一次與最近一次點擊的時間。<strong>只有次數與時間，不含影片、標題或任何內容，也不會傳送出去</strong>；你可在擴充功能視窗的「看完之後・使用次數」看到這些數字</li>
   </ul>
   <p><strong>OAuth 存取 Token</strong> 僅存於記憶體（不寫入磁碟），瀏覽器關閉後即消失。</p>
 
-  <h2>5. Google 帳號登入（選用）</h2>
+  <h2>6. Google 帳號登入（選用）</h2>
   <p>你可選擇以 Google 帳號登入以解鎖進階功能。登入流程透過 Google OAuth 2.0 進行。我們會取得以下資料：</p>
   <ul>
     <li><strong>電子郵件地址</strong>（email）— 識別帳號</li>
@@ -130,10 +145,10 @@
   <p>以上資料<strong>僅儲存在你的裝置本機</strong>，不上傳至任何伺服器。</p>
   <p>登出時，本擴充功能會撤銷 Google 端的存取授權，並清除所有本機登入資料。</p>
 
-  <h2>6. 我們沒有後端伺服器</h2>
+  <h2>7. 我們沒有後端伺服器</h2>
   <p>本擴充功能<strong>不設有任何自建後端伺服器</strong>。所有 API 呼叫皆由你的瀏覽器直接發出至第三方服務本身（Gemini API 使用你自己的金鑰；Gumroad 僅在升級Pro時發出授權驗證請求），資料不經過我方任何中間服務。</p>
 
-  <h2>7. 權限說明</h2>
+  <h2>8. 權限說明</h2>
   <ul>
     <li><strong>activeTab / scripting</strong> — 在 YouTube 頁面注入面板 UI</li>
     <li><strong>storage / unlimitedStorage</strong> — 儲存 API 金鑰、設定、摘要歷史、訂閱清單至本機（訂閱功能累積的摘要卡片可能超過預設 5MB 限制，故需要 unlimitedStorage）</li>
@@ -145,36 +160,36 @@
     <li><strong>optional_host_permissions（https://*/*，動態請求）</strong> — <strong>僅在你訂閱 Podcast 節目時才會跳出授權請求</strong>。因 Podcast 音檔可能託管在任意網域（SoundOn、Firstory、Anchor 等平台各不相同），無法預先列舉所有可能網域，故採用動態授權；YouTube 頻道訂閱與其他所有功能都不需要此權限</li>
   </ul>
 
-  <h2>8. 資料分享</h2>
+  <h2>9. 資料分享</h2>
   <p>我們<strong>不會</strong>將你的個人資料出售、出租或分享給任何第三方，除非：</p>
   <ul>
     <li>法律要求（例如法院命令）</li>
     <li>你明確同意</li>
   </ul>
 
-  <h2>9. 資料刪除</h2>
+  <h2>10. 資料刪除</h2>
   <p>
     若要完全清除所有本機資料，請在 Chrome 擴充功能管理頁面移除本擴充功能。
     登出可清除登入相關資料，但不影響 API 金鑰與摘要歷史。取消訂閱頻道/Podcast會移除對應的訂閱清單與摘要卡片。
   </p>
 
-  <h2>10. 兒童隱私</h2>
+  <h2>11. 兒童隱私</h2>
   <p>本服務不針對 13 歲以下兒童。若發現意外收集了兒童資料，請聯絡我們。</p>
 
-  <h2>11. 聯絡我們</h2>
+  <h2>12. 聯絡我們</h2>
   <p>
     如有隱私相關問題，請聯絡：<br>
     <a href="mailto:alex1491tw@gmail.com">alex1491tw@gmail.com</a>
   </p>
 
-  <h2>12. 政策更新</h2>
+  <h2>13. 政策更新</h2>
   <p>
     如本政策有重大變更，我們會在擴充功能更新說明中告知。
     繼續使用本擴充功能即代表你接受最新版本的隱私權政策。
   </p>
 
   <footer>
-    © 2026 自由 YT 總結器 &nbsp;·&nbsp;
+    © 2026 YT萃取器 &nbsp;·&nbsp;
     <a href="mailto:alex1491tw@gmail.com">alex1491tw@gmail.com</a>
   </footer>
 
