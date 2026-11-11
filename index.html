@@ -36,7 +36,7 @@
 <body>
 
   <h1>🔐 隱私權政策</h1>
-  <p class="subtitle">YT萃取器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-11-06</p>
+  <p class="subtitle">YT萃取器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-11-11</p>
 
   <div class="highlight">
     <strong>一句話摘要：</strong>本擴充功能將 YouTube 影片內容（URL、字幕、音訊）、Podcast 音檔、或你選取的文字，傳送至 Google Gemini API 進行 AI 分析，分析結果與設定資料儲存在你的裝置本機。我們沒有自己的後端伺服器，不收集任何資料。
@@ -59,7 +59,11 @@
       字幕文字（從 YouTube 伺服器下載）會傳送至 Gemini API。
     </li>
     <li>
-      <strong>🎬 視覺分析模式</strong>（無字幕備援，需登入）<br>
+      <strong>🎧 AI 聽打模式</strong>（字幕讀不到時的第一備援，2026-11 新增）<br>
+      只傳送 YouTube 影片的 URL 字串與要聽的時間範圍（起訖秒數與取樣率）給 Gemini，由 Google 讀取影片音訊並轉成逐字稿。你的裝置不下載影片；轉出的逐字稿只暫存在目前這個分頁的記憶體（重新整理或關閉頁面即消失），我方不收集、不上傳到我方伺服器。
+    </li>
+    <li>
+      <strong>🎬 視覺分析模式</strong>（無字幕備援）<br>
       與 URL 直傳模式相同，僅傳送 YouTube URL 字串，由 Gemini 自行讀取影片畫面內容，用於字幕/URL直傳皆失敗時的備援分析。
     </li>
     <li>
