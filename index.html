@@ -36,7 +36,7 @@
 <body>
 
   <h1>🔐 隱私權政策</h1>
-  <p class="subtitle">YT萃取器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-11-19</p>
+  <p class="subtitle">YT萃取器 Chrome 擴充功能 &nbsp;·&nbsp; 最後更新：2026-11-22</p>
 
   <div class="highlight">
     <strong>一句話摘要：</strong>本擴充功能將 YouTube 影片內容（URL、字幕、音訊）、Podcast 音檔、或你選取的文字，傳送至 Google Gemini API 進行 AI 分析，分析結果與設定資料儲存在你的裝置本機。我們沒有自己的後端伺服器，不收集任何資料。
@@ -87,6 +87,13 @@
       訂閱的 Podcast 節目新集數音檔會從其託管網域（例如 SoundOn、Firstory 等，因各節目託管平台不同，需要 <code>optional_host_permissions</code> 動態授權）下載，並透過 Google Gemini <strong>Files API</strong> 上傳音檔本身進行摘要，摘要完成後由 Google 端刪除暫存音檔（依 Gemini Files API 規則，上傳檔案預設 48 小時後自動刪除）。
     </li>
     <li>
+      <strong>🎧 Podcast／Spotify 單集摘要</strong>（你在擴充功能視窗按〔找〕與〔摘要這一集〕才會執行；摘要時需要你額外授權音檔所在網域的存取權限）<br>
+      ① <strong>查標題</strong>：你按〔找〕時，會把<strong>單集標題</strong>（取自目前分頁標題，或你自己貼上的文字）傳給 <strong>Apple 的 iTunes Search API</strong>（<code>itunes.apple.com</code>），找出這一集的發行者音檔網址（由 Apple 回傳；擴充功能本身不會去抓發行者的 RSS）；只送標題，不送你的 API 金鑰、帳號或其他資料，Apple 會收到這個標題與你的連線資訊。<br>
+      ② <strong>對 Spotify 的限制</strong>：擴充功能不會向 Spotify 自有網域（<code>spotify.com</code>、<code>spotifycdn.com</code>、<code>scdn.co</code>）發出請求，也不讀取 Spotify 頁面內容或你的 Spotify 帳號資料。擴充功能視窗開啟時只讀「目前分頁的網址與標題」（用來判斷是不是 Spotify 單集頁並預填標題），你不按〔找〕就不會傳到任何地方。音檔只取自發行者公開的網址：網址本身在 Spotify 自有網域就不會下載；若下載時被轉址到 Spotify 自有網域，擴充功能會在收到回應後丟棄、不讀取內容，<strong>但 Chrome 擴充功能無法阻止那一次轉址請求本身發生</strong>。<br>
+      ③ <strong>摘要</strong>：你確認節目名、日期與長度後，音檔才會從發行者的託管網域下載（部分節目的託管商，例如 <code>anchor.fm</code>，雖屬 Spotify 旗下，但它的音檔網址是發行者對外公開的分發網址，擴充功能照一般託管網域處理，不在上面②列的三個網域內；下載也可能經過發行者使用的轉址或下載統計服務，你的連線資訊會被這些服務看到），並透過 Google Gemini <strong>Files API</strong> 上傳音檔本身進行摘要（Google 端 48 小時後自動刪除暫存音檔）。只靠標題配對，可能配到不同節目的同名單集，所以一律先讓你確認，不會自動摘要。<br>
+      ④ <strong>免費金鑰的資料用途</strong>：依 <a href="https://ai.google.dev/gemini-api/terms" target="_blank">Google 的 Gemini API 附加條款</a>，若你使用的是免費（未計費）的 API 金鑰，你送出的內容（含這個功能與其他所有分析送出的內容）可能被 Google 用來改進產品，並可能由人工審閱；計費中的付費金鑰則不會（歐盟、瑞士、英國地區另有規定，以 Google 條款為準）。這是 Google 對你的金鑰適用的條款，不是本擴充功能收集；請不要用免費金鑰分析含敏感或個人資訊的內容。
+    </li>
+    <li>
       <strong>🌙 今日回顧</strong>（手動觸發，免費方案每月3次，Pro無限次；Pro可額外設定每日自動於指定時間產生並跳出系統通知，需累積當日3支以上分析紀錄才會觸發，內容不足時不會發送）<br>
       將你當天已產生的摘要文字（非原始逐字稿，是已經AI處理過的摘要內容，最多1500字/篇）彙整後傳送至 Gemini API，整合成單一回顧報告。回顧結果會與其他分析紀錄一併儲存在本機。
     </li>
@@ -107,6 +114,10 @@
       當你正在看 YouTube 的頻道內搜尋、頻道的影片／直播分頁、播放清單或站內搜尋結果頁，擴充功能視窗會多出一張卡片。按〔收集並全部分析〕後，擴充功能的背景程式會先把一小段程式注入<strong>目前這個 YouTube 分頁</strong>（收集與接著的分析由背景程式進行，收集到一半把視窗關掉也會繼續做完），由該分頁向 <code>www.youtube.com</code> 自己的伺服器請求後續幾頁的影片清單（做法與你自己在頁面往下捲動、載入更多影片相同，使用頁面本身的設定與你目前的 YouTube 登入狀態；讀不到頁面資料時，會改為重新抓取你目前這一頁），最多收集 300 支，每次請求最多等 15 秒。收集到的資料（影片 ID、標題、長度、頻道、發布時間、觀看數，以及是否為 Shorts／直播／首播預告／會員專屬的標記、夾帶在結果裡的播放清單與頻道名稱、搜尋關鍵字）<strong>只暫存在瀏覽器記憶體中（背景程式處理期間，以及視窗開著時顯示於擴充功能視窗）、不會傳給我們或第三方</strong>，不寫入分析歷史、不計入使用次數；其中只有要分析的影片 ID（與標題前 100 字）會依下一項寫進你電腦上的批次佇列與進度紀錄。收集完成後，擴充功能會把篩選後的影片 ID 存進本機的批次佇列（<code>chrome.storage.local</code>），並接著開始「全部分析」（見下一項）。視窗裡「其他」摺疊區另有〔📋 複製網址〕（才會放進剪貼簿）、〔⬇ 網址 .txt〕與〔⬇ 表格 .csv〕（才會存成你電腦上的檔案）、〔📥 只加入佇列〕（只存進佇列、不分析）。
     </li>
     <li>
+      <strong>📦 貼上播放清單網址（批次分析欄）</strong>（選用；只有你在擴充功能視窗的「批次分析多部影片」欄貼上 YouTube 播放清單網址並按〔加入批次佇列〕才會執行，不會自動觸發；<strong>這一步不使用 Gemini，也不會傳送任何內容給我們或第三方</strong>）<br>
+      擴充功能的背景程式會用 Chrome 的分頁功能在<strong>背景分頁</strong>（不切換到前景）開啟你貼的那個播放清單頁（<code>www.youtube.com/playlist?list=清單ID</code>；網址上的追蹤參數會丟掉，一次最多 5 個清單），把與「頁面影片清單收集」相同的收集程式注入這個分頁，重新抓取該頁並向 <code>www.youtube.com</code> 自己的伺服器請求後續幾頁的影片清單（最多 300 支，使用你目前的 YouTube 登入狀態），讀完<strong>就把這個背景分頁關掉</strong>。篩選後（預設略過 Shorts、直播／首播預告、會員專屬）的<strong>影片 ID</strong> 只存進你電腦上的批次佇列（<code>chrome.storage.local</code>），<strong>不會自動開始分析</strong>，要按佇列卡片的〔🚀 全部分析〕才會開始（見下一項）。收集到的標題等其他資料只暫存在瀏覽器記憶體中、不寫入任何地方。把視窗關掉不會中斷讀取，讀完會用 Chrome 通知告知。
+    </li>
+    <li>
       <strong>🚀 全部分析（批次佇列）</strong>（選用；只有你按〔🚀 全部分析〕或〔🚀 收集並全部分析〕才會執行；<strong>分析送出的內容與你自己逐支開啟影片分析完全相同，使用你自己的 Gemini 金鑰與額度，不經過我們</strong>）<br>
       開始前會先檢查：沒有設定 Gemini API Key 就不會開始；未登入時每天只有 3 次免費分析，這一輪只會排得下剩餘的次數。開始後，擴充功能會在背景依序開啟批次佇列中的影片：每一支用 Chrome 的分頁功能開在<strong>背景分頁</strong>（不切換到前景，<code>www.youtube.com/watch?v=影片ID</code>），開好後立刻設為靜音；同時最多 2 支、兩次開啟至少間隔 4 秒、一輪最多 30 支。每個分頁載入後，內容腳本讀到佇列就會自動展開面板並走一般的分析流程（取得字幕或留言並送 Gemini 分析，細節同上方各分析模式）；20 秒內沒展開的話，擴充功能會請它展開一次。<br>
       <strong>背景會讀這些分頁的什麼</strong>：約每 3 秒讀一次——分頁的網址（只有 youtube.com 讀得到，用來確認它還是那支影片）、是否被你切到前景、是否被瀏覽器釋放；並在分頁內執行一小段程式，檢查「分析面板、錯誤訊息卡（含卡片上的文字，最多前 120 字）、Google 忙線重試卡、金鑰設定區、登入提示、長影片的段落重試鈕是否出現」、狀態列是否顯示「無可用資料」，以及該頁的分析是否已跑完，同時，只要該分頁還在背景（隱藏）狀態，就<strong>把它裡面正在播放的影片暫停</strong>（你把它切到前景看的時候不會去動它）。<strong>不讀影片的字幕、留言或畫面內容。</strong>是否完成，以你電腦上的「完整解析結果」存檔為準。<br>
@@ -124,7 +135,7 @@
   <ul>
     <li>此背景流程只在你主動訂閱的頻道/節目上執行，不會掃描或存取你未訂閱的內容</li>
     <li>產生的摘要卡片儲存在本機（<code>chrome.storage.local</code>），可在 popup 內查看或移除</li>
-    <li>訂閱 Podcast 節目時，因各節目音檔託管網域不同，會請求 <code>optional_host_permissions</code>（動態網域存取權限）——這個授權彈窗只在你輸入 Podcast 連結時才會出現，YouTube 頻道訂閱不需要此授權</li>
+    <li>訂閱 Podcast 節目時，因各節目音檔託管網域不同，會請求 <code>optional_host_permissions</code>（動態網域存取權限）——這個授權彈窗在你輸入 Podcast 連結時會出現（「🎧 Podcast／Spotify 單集摘要」按〔摘要這一集〕時也會出現同一個授權），YouTube 頻道訂閱不需要此授權</li>
   </ul>
 
   <h2>3. 知識庫（File Search，選用功能）</h2>
@@ -157,9 +168,10 @@
     <li><strong>其他設定與狀態</strong> — 主題偏好、各功能每月使用次數、AI 模型清單與健康狀態的快取（以 API 金鑰的短雜湊指紋區分不同金鑰，指紋無法還原金鑰）、頻道／Podcast 訂閱的背景處理設定與排程狀態、每日回顧的開關與時間等。都是設定、計數或狀態，<strong>不含影片內容</strong>，只存在你的電腦，不會傳送出去</li>
     <li><strong>輸出語言偏好</strong> — 你在面板上選的摘要輸出語言（繁體中文、English、Español）。只是顯示偏好，不含影片或任何內容，只存在你的電腦，不會傳送出去</li>
     <li><strong>面板外觀偏好</strong> — 面板在 YouTube 頁面上的位置（靠左或靠右、離邊緣與上緣的距離、寬度），以及「⚙ 調整」「⋯ 更多」兩個區塊是否展開。只是顯示偏好，不含影片或任何內容，只存在你的電腦，不會傳送出去</li>
-    <li><strong>每日使用次數</strong> — 免費方案的每日次數計數</li>
+    <li><strong>每日使用次數</strong> — 免費方案（未登入）的每日次數計數；YouTube 摘要與「Podcast／Spotify 單集摘要」共用同一組，未登入每天 3 次（以 UTC 日期換日，台灣時間早上 8 點），登入後不限；只有摘要成功才計次，只存日期與次數</li>
     <li><strong>登入資料</strong>（選用，Google 帳號登入後）— 電子郵件、顯示名稱、大頭貼網址、帳號識別碼（sub）</li>
     <li><strong>訂閱清單與摘要卡片</strong>（選用，訂閱頻道/Podcast後）— 訂閱的頻道ID/Podcast RSS網址、標題、縮圖網址，以及自動產生的摘要卡片內容</li>
+    <li><strong>單集摘要卡片與進度</strong>（選用，使用「🎧 Podcast／Spotify 單集摘要」後）— 摘要卡片（最多與訂閱的摘要卡片合計 200 張）含單集標題、節目名、節目的 RSS 網址、發行日期、摘要文字與 token 數，只存在你的電腦；進行中的工作狀態（標題、節目名、進度文字、失敗原因）存在瀏覽器的工作階段儲存（<code>chrome.storage.session</code>，關閉瀏覽器或擴充功能更新／重新載入就消失）。不會自動傳送</li>
     <li><strong>Pro授權碼與授權狀態</strong>（選用，升級Pro後）— 見上方「Pro授權驗證」章節</li>
     <li><strong>收藏庫</strong>（選用，你主動點擊收藏後）— 最多200筆，獨立於50筆上限的分析歷史紀錄之外儲存，不會被自動清除</li>
     <li><strong>單字庫</strong>（選用，你主動在「📒 生字本」按〔＋存入〕後）— 最多 3,000 個單字，每個含單字、詞性、繁體中文意思、影片中的原句、AI 寫的例句、影片標題、影片 ID、時間點與存入時間；另存你選的程度。只存在你的電腦，不會自動傳送；可隨時按〔清空〕刪除，移除擴充功能也會一併清除</li>
@@ -185,14 +197,15 @@
 
   <h2>8. 權限說明</h2>
   <ul>
-    <li><strong>activeTab / scripting</strong> — 在 YouTube 頁面注入面板 UI；在你於擴充功能視窗按〔收集並全部分析〕時，把清單收集程式注入你目前的 YouTube 分頁（收集完立即移除，不會常駐）；以及在「全部分析」進行中，讀取背景分頁上分析面板、錯誤訊息卡等是否出現，並暫停背景分頁裡的影片（見上方「全部分析」）</li>
+    <li><strong>activeTab / scripting</strong> — 在 YouTube 頁面注入面板 UI；在你於擴充功能視窗按〔收集並全部分析〕時，把清單收集程式注入你目前的 YouTube 分頁，或在你於「批次分析」欄貼上播放清單網址時，注入擴充功能自己開的那個背景分頁（收集完立即移除，不會常駐，自己開的分頁讀完即關閉）；以及在「全部分析」進行中，讀取背景分頁上分析面板、錯誤訊息卡等是否出現，並暫停背景分頁裡的影片（見上方「全部分析」）</li>
     <li><strong>storage / unlimitedStorage</strong> — 儲存 API 金鑰、設定、摘要歷史、訂閱清單至本機（訂閱功能累積的摘要卡片可能超過預設 5MB 限制，故需要 unlimitedStorage）</li>
     <li><strong>identity</strong> — Google OAuth 登入流程</li>
     <li><strong>alarms</strong> — 頻道/Podcast訂閱的定期背景檢查排程、Pro授權每7天自動重新驗證排程，以及「全部分析」進行中每 30 秒一次的接續排程（結束就取消）</li>
     <li><strong>notifications</strong> — 訂閱的頻道/節目有新內容摘要完成時顯示系統通知；「全部分析」結束、暫停或中斷時顯示一則系統通知；在你把擴充功能視窗關掉之後，收集失敗、沒有找到影片，或影片已加入佇列但沒有開始分析（例如還沒設定金鑰、已有一輪在分析中）時，顯示一則系統通知（內容只有原因，不含影片資料）</li>
+    <li><strong>host_permissions（www.youtube.com、generativelanguage.googleapis.com、itunes.apple.com）</strong> — <code>www.youtube.com</code>：在 YouTube 頁面顯示面板，並向 YouTube 取得字幕、留言與影片資訊；<code>generativelanguage.googleapis.com</code>：把內容傳給 Google Gemini 進行分析；<code>itunes.apple.com</code>：訂閱 Apple Podcasts 節目時用節目編號查詢節目的 RSS 網址，以及「🎧 Podcast／Spotify 單集摘要」按〔找〕時用單集標題向 Apple 的 iTunes Search 查詢（只送標題，見上方該功能的說明）</li>
     <li><strong>host_permissions（api.gumroad.com）</strong> — Pro授權碼驗證專用，僅在你輸入授權碼時才會發出請求</li>
     <li><strong>nativeMessaging</strong> — 呼叫本機 yt-dlp 字幕橋接程式專用（見上方「yt-dlp 字幕橋接」說明），安裝擴充功能時即一併授權；此權限本身不會讓擴充功能存取任意本機程式，只能連線到你透過 <code>setup_caption_bridge_helper.py</code> 明確註冊過的單一橋接程式，沒跑過設定精靈就不會有任何本機程式被實際呼叫</li>
-    <li><strong>optional_host_permissions（https://*/*，動態請求）</strong> — <strong>僅在你訂閱 Podcast 節目時才會跳出授權請求</strong>。因 Podcast 音檔可能託管在任意網域（SoundOn、Firstory、Anchor 等平台各不相同），無法預先列舉所有可能網域，故採用動態授權；YouTube 頻道訂閱與其他所有功能都不需要此權限</li>
+    <li><strong>optional_host_permissions（https://*/*，動態請求）</strong> — <strong>僅在你訂閱 Podcast 節目，或按「🎧 Podcast／Spotify 單集摘要」的〔摘要這一集〕時才會跳出授權請求</strong>（單集摘要不需要登入，未登入的免費使用者也會看到這個授權視窗；已授權過就不會再問）。因 Podcast 音檔可能託管在任意網域（SoundOn、Firstory、Anchor 等平台各不相同），單集的音檔網址還可能被轉址到別的網域，無法預先列舉所有可能網域，故採用動態授權。授權後，Chrome 會把擴充功能對所有 https 網站的存取權視為已授予，直到你在 Chrome 的擴充功能管理頁撤銷；你不允許，就不會下載音檔、也不會摘要。YouTube 頻道訂閱、YouTube 影片分析與其他所有功能都不需要此權限</li>
   </ul>
 
   <h2>9. 資料分享</h2>
